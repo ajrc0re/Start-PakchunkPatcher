@@ -3,10 +3,16 @@ param (
     [Parameter()]
     [string]$DirHelper = 'DirHelper.txt',
 
-    [Parameter(Mandatory=$true)]
+    [Parameter()]
     # check for DirHelper.txt in the current directory and use its content as the game directory
     # if it exists, otherwise use the default steam path for the game directory
-    [string]$gameDir = if ((Resolve-Path .\$DirHelper).ProviderPath) {Get-Content $DirHelper -Raw} else {'C:\Program Files (x86)\Steam\steamapps\common\FINAL FANTASY VII REBIRTH'}
+    [string]$gameDir = (& {
+        if (Test-Path -Path (Join-Path -Path (Get-Location) -ChildPath $DirHelper)) {
+            Get-Content -Path (Join-Path -Path (Get-Location) -ChildPath $DirHelper) -Raw
+        } else {
+            'C:\Program Files (x86)\Steam\steamapps\common\FINAL FANTASY VII REBIRTH'
+        }
+    }),
 
     [Parameter()]
     [string]$mods = "$gameDir\End\Content\Paks\~mods",
